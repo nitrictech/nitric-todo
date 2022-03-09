@@ -1,12 +1,13 @@
-export interface ShirtProduct {
-  color: string;
-  img: string;
+export interface Task {
   id: string;
-  createdAt: number;
+  name: string;
+  complete: boolean;
+  description?: string;
+  dueDate?: Date;
 }
 
-export interface ShirtResponse {
-  shirts: ShirtProduct[];
+export interface TaskList {
+  tasks: Task[];
 }
 
-export type ShirtsPostRequest = Omit<ShirtProduct, "id">;
+export type ShirtsPostRequest = Omit<Task, "id">;
