@@ -5,6 +5,7 @@ export interface Task {
   complete: boolean;
   description?: string;
   dueDate?: Date;
+  createdAt?: Date;
 }
 
 export interface TaskList {

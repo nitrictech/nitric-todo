@@ -25,7 +25,7 @@ taskListApi.get("/:listid/:id", async (ctx) => {
     const taskListRef = taskListCol.doc(listId);
     const task = await taskListRef.collection<Task>("tasks").doc(id).get();
 
-    ctx.res.json(task);
+    ctx.res.json(taskList);
   } catch (err) {
     console.log(err);
     ctx.res.body = "Failed to retrieve tasks";
@@ -39,6 +39,8 @@ taskListApi.get("/:listid/:id", async (ctx) => {
 taskListApi.get("/:id", async (ctx) => {
   const { id } = ctx.req.params;
   const filters = ctx.req.query as Filters;
+
+  console.log("filters", ctx.req.query);
 
   try {
     const taskListRef = taskListCol.doc(id);
