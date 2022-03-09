@@ -6,8 +6,12 @@ export interface Task {
   dueDate?: Date;
 }
 
-export interface TaskList {
+export interface TaskListResponse {
   tasks: Task[];
 }
 
-export type ShirtsPostRequest = Omit<Task, "id">;
+export type Filters = Partial<Task>;
+
+export type TaskListRequest = Filters
+
+export type TaskPostRequest = Omit<Task, "id" | "complete">;
