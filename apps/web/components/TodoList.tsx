@@ -1,76 +1,61 @@
-import { FC, useState, useEffect, useReducer } from "react";
+import { FC, useState, useEffect } from "react";
 import { TaskList, Task, TaskPostRequest } from "types";
 import { now } from "../lib/dates";
-import Alert from "./Alert";
-import SortDropdown, { SortType } from "./SortDropdown";
 import Todo from "./Todo";
 
 interface Props {
   taskList: TaskList;
+  updateTaskList: () => void;
 }
 
-function todoSort(state: Task[], action): Task[] {
-  switch(action.type as SortType) {
-    case 'ascendingDue':
-      return state.sort((a, b) => b.dueDate - a.dueDate);
-    case "descendingDue":
-      return state.sort((a, b) => a.dueDate - b.dueDate);
-    case "ascendingCreated":
-      return state.sort((a, b) => b.createdAt - a.createdAt);
-    case "descendingCreated":
-      return state.sort((a, b) => a.createdAt - b.createdAt);
-    default:
-      console.log("Sort type doesn't exist");
-  }
-};
-
-const TodoList: FC<Props> = ({ taskList }) => {
-  const [todos, dispatchTodos] = useReducer(todoSort, taskList.tasks);
+const TodoList: FC<Props> = ({ taskList, updateTaskList }) => {
+  const [todos, setTodos] = useState<Task[]>(taskList.tasks);
   const [newTask, setNewTask] = useState<TaskPostRequest>({
     name: "",
     complete: false,
     createdAt: now(),
   });
-  const [errorText, setError] = useState("");
+
+  useEffect(() => {
+    if (taskList) {
+      setTodos(taskList.tasks);
+    }
+  }, [taskList]);
 
   const addTodo = async (newTask: TaskPostRequest) => {
     await fetch(`/apis/taskList/${taskList.id}`, {
       method: "POST",
       body: JSON.stringify(newTask),
     });
+    updateTaskList();
   };
 
   const deleteTodo = async (listId: string, taskId: string) => {
     await fetch(`/apis/taskList/${listId}/${taskId}`, {
       method: "DELETE",
     });
+    updateTaskList();
   };
 
   return (
     <div className='w-full'>
       <div>
-        <h1 className='font-bold'>{taskList.name}</h1>
-        <SortDropdown sortFunc={dispatchTodos} />
+        <h2 className='font-bold'>{taskList.name}</h2>
       </div>
-      <button onClick={() => dispatchTodos({ type: "ascendingCreated" })}>
-        Click{" "}
-      </button>
-      <div className='flex gap-2 my-2'>
+      <div className='flex gap-2 my-2 sm:flex-row flex-col'>
         <input
           className='rounded w-full p-2'
           type='text'
-          placeholder='New task'
+          placeholder='Enter New task'
           value={newTask.name}
           onChange={(e) => {
-            setError("");
             setNewTask((task) => ({ ...task, name: e.target.value }));
           }}
         />
         <input
-          className='rounded w-1/4 p-2'
+          className='rounded w-full sm:w-72 p-2'
           type='date'
           onChange={(e) => {
-            setError("");
             setNewTask((task) => ({
               ...task,
               dueDate: new Date(e.target.value).getTime(),
@@ -78,13 +63,13 @@ const TodoList: FC<Props> = ({ taskList }) => {
           }}
         />
         <button
-          className='rounded-full bg-orange-200 hover:bg-orange-300 w-1/6'
+          className='rounded-xl disabled:bg-slate-300 w-full sm:w-48 text-white bg-orange-600 hover:bg-orange-500 p-2'
+          disabled={!newTask.name}
           onClick={() => addTodo(newTask)}
         >
           Add
         </button>
       </div>
-      {!!errorText && <Alert text={errorText} />}
       <div className='bg-white shadow overflow-hidden rounded-md mb-10'>
         <ul>
           {todos.map((todo) => (

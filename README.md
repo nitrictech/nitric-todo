@@ -1,77 +1,96 @@
-# Turborepo starter
+# Nitric To-Dos
 
-This is an official Yarn v1 starter turborepo.
+In this tutorial, you'll create a [Next.js](https://nextjs.org/) application that connects to a task list [Nitric API](https://nitric.io/docs/apis) and a task list [Nitric Collection](https://nitric.io/docs/collections). We will also be using [Tailwind CSS](https://tailwindcss.com/) for styling and [Turborepo](https://turborepo.org/) for our build system.
 
-## What's inside?
+## Prerequisites
 
-This turborepo uses [Yarn](https://classic.yarnpkg.com/lang/en/) as a package manager. It includes the following packages/apps:
+- [Node.js](https://nodejs.org/en/download/)
+- [Nitric CLI](https://nitric.io/docs/installation)
 
-### Apps and Packages
+## Set up the Next.js app
 
-- `docs`: a [Next.js](https://nextjs.org) app
-- `web`: another [Next.js](https://nextjs.org) app
-- `ui`: a stub React component library shared by both `web` and `docs` applications
-- `config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `tsconfig`: `tsconfig.json`s used throughout the monorepo
+Clone the [Next.js starter repository](https://github.com/nitrictech/nitric-todo).
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-## Setup
-
-This repository is used in the `npx create-turbo` command, and selected when choosing which package manager you wish to use with your monorepo (Yarn).
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-yarn run build
+```bash
+git clone https://github.com/nitrictech/nitric-todo
 ```
 
-### Develop
+Install the dependencies with npm or yarn.
 
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-yarn run dev
+```text
+cd nextjs-starter
+yarn install
 ```
 
-### Remote Caching
+Next, open the project in your editor of choice.
 
-Turborepo can use a technique known as [Remote Caching (Beta)](https://turborepo.org/docs/features/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching (Beta) you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
+```bash
+> cd my-profile-api
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Make sure all dependencies are resolved with yarn or npm.
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your turborepo:
-
-```
-npx turbo link
+```bash
+yarn install
 ```
 
-## Useful Links
+## Run Locally
 
-Learn more about the power of Turborepo:
+To test out our project, we can do
 
-- [Pipelines](https://turborepo.org/docs/features/pipelines)
-- [Caching](https://turborepo.org/docs/features/caching)
-- [Remote Caching (Beta)](https://turborepo.org/docs/features/remote-caching)
-- [Scoped Tasks](https://turborepo.org/docs/features/scopes)
-- [Configuration Options](https://turborepo.org/docs/reference/configuration)
-- [CLI Usage](https://turborepo.org/docs/reference/command-line-reference)
+```bash
+nitric run
+```
+
+## Deploying
+
+### Deploy the Next.js App
+
+Choose one of the following deploy buttons and make sure to update the `DATABASE_URL` variable during this setup process.
+
+#### Deploy on Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nitrictech/nextjs-starter&env=DATABASE_URL)
+
+#### Deploy on Netlify
+
+\*Note: The `Netlify.toml` file in this repository includes the configuration for you to customize the `DATABASE_URL` property on the initial deploy.
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/nitrictech/nextjs-starter)
+
+### Deploy the Nitric API
+
+Setup your credentials and any other cloud specific configuration:
+
+- [AWS](/docs/reference/aws)
+- [Azure](/docs/reference/azure)
+- [GCP](/docs/reference/gcp)
+
+Run the appropriate deployment command
+
+> Warning: Publishing services to the cloud may incur costs.
+> AWS
+
+```bash
+nitric stack up
+```
+
+> Azure
+
+```bash
+nitric stack up
+```
+
+> GCP
+
+```bash
+nitric stack up
+```
+
+When the deployment is complete, go to the relevant cloud console and you'll be able to see and interact with your API.
+
+To undeploy run the following command.
+
+```bash
+nitric stack down
+```

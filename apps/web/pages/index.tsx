@@ -1,15 +1,28 @@
 import Head from "next/head";
-import { useState } from "react";
 import useSWR from "swr";
 import type { TaskList } from "types";
 import fetcher from "../lib/fetcher";
 import TodoList from "../components/TodoList";
+import { useState } from "react";
 
 export default function Web() {
-  const [pagingToken, setPagingToken] = useState(null);
-  const { data, mutate } = useSWR<TaskList[]>("/apis/taskList", fetcher);
+  const [newListName, setNewListName] = useState("");
+  const { data, mutate: updateTaskList } = useSWR<TaskList[]>(
+    "/apis/taskList",
+    fetcher
+  );
 
   const loading = !data;
+
+  const handleAddList = async () => {
+    await fetch("/apis/taskList", {
+      method: "POST",
+      body: JSON.stringify({
+        name: newListName,
+      }),
+    });
+    updateTaskList();
+  };
 
   return (
     <div>
@@ -27,13 +40,31 @@ export default function Web() {
                     border-4 border-dashed border-orange-500 border-t-transparent'
           />
         ) : (
-          data.map((taskList) => (
-            <TodoList key={taskList.id} taskList={taskList} />
-          ))
+          <>
+            {data.map((taskList) => (
+              <TodoList
+                key={taskList.id}
+                taskList={taskList}
+                updateTaskList={updateTaskList}
+              />
+            ))}
+            <input
+              className='rounded w-full p-2'
+              type='text'
+              placeholder='Enter New List Name'
+              value={newListName}
+              onChange={(evt) => setNewListName(evt.target.value)}
+            />
+            <button
+              disabled={!newListName}
+              className='rounded-xl disabled:bg-slate-300 text-white bg-orange-600 hover:bg-orange-500 w-full p-4'
+              onClick={handleAddList}
+            >
+              Add List
+            </button>
+          </>
         )}
       </main>
-
-      <footer></footer>
     </div>
   );
 }

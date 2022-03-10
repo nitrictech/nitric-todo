@@ -1,4 +1,4 @@
-import { api, collection } from "@nitric/sdk";
+import { api, collection, schedule } from "@nitric/sdk";
 import uuid from "short-uuid";
 import {
   Filters,
@@ -6,6 +6,7 @@ import {
   TaskList,
   TaskListPostRequest,
   TaskPostRequest,
+  ToggleRequest,
 } from "types";
 import { sortByCreatedAt } from "../common/utils";
 
@@ -25,7 +26,7 @@ taskListApi.get("/:listid/:id", async (ctx) => {
     const taskListRef = taskListCol.doc(listId);
     const task = await taskListRef.collection<Task>("tasks").doc(id).get();
 
-    ctx.res.json(taskList);
+    ctx.res.json(task);
   } catch (err) {
     console.log(err);
     ctx.res.body = "Failed to retrieve tasks";
@@ -39,8 +40,6 @@ taskListApi.get("/:listid/:id", async (ctx) => {
 taskListApi.get("/:id", async (ctx) => {
   const { id } = ctx.req.params;
   const filters = ctx.req.query as Filters;
-
-  console.log("filters", ctx.req.query);
 
   try {
     const taskListRef = taskListCol.doc(id);
@@ -205,6 +204,7 @@ taskListApi.post("/:id", async (ctx) => {
 // Update task as complete
 taskListApi.patch("/:listid/:id", async (ctx) => {
   const { listid: listId, id } = ctx.req.params;
+  const { completed } = ctx.req.json() as ToggleRequest;
 
   try {
     const taskListRef = taskListCol.doc(listId);
@@ -216,10 +216,10 @@ taskListApi.patch("/:listid/:id", async (ctx) => {
       .doc(id)
       .set({
         ...originalTask,
-        complete: true,
+        complete: completed,
       });
 
-    ctx.res.body = "Successfully marked task as complete";
+    ctx.res.body = "Successfully updated task";
   } catch (err) {
     console.log(err);
     ctx.res.body = "Failed to retrieve tasks";
