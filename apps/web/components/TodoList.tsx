@@ -9,10 +9,9 @@ interface Props {
   taskList: TaskList;
 }
 
-const todoSort = (state: Task[], action): Task[] => {
-  console.log(action.type);
-  switch (action.type as SortType) {
-    case "ascendingDue":
+function todoSort(state: Task[], action): Task[] {
+  switch(action.type as SortType) {
+    case 'ascendingDue':
       return state.sort((a, b) => b.dueDate - a.dueDate);
     case "descendingDue":
       return state.sort((a, b) => a.dueDate - b.dueDate);
@@ -46,6 +45,11 @@ const TodoList: FC<Props> = ({ taskList }) => {
       method: "DELETE",
     });
   };
+
+  const deleteTodo = async (id) => {
+  }
+
+
 
   return (
     <div className='w-full'>
