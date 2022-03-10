@@ -46,11 +46,6 @@ const TodoList: FC<Props> = ({ taskList }) => {
     });
   };
 
-  const deleteTodo = async (id) => {
-  }
-
-
-
   return (
     <div className='w-full'>
       <div>
