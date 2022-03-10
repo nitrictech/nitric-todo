@@ -1,15 +1,13 @@
 import Head from "next/head";
 import { useState } from "react";
 import useSWR from "swr";
-import type { TaskList } from '../../../packages/types/index';
+import type { TaskList } from "types";
 import fetcher from "../lib/fetcher";
-import TodoList from '../components/TodoList';
-import { testTasks } from '../lib/testTodos';
+import TodoList from "../components/TodoList";
 
 export default function Web() {
   const [pagingToken, setPagingToken] = useState(null);
-  const data = testTasks;
-  // const { data, mutate } = useSWR<TaskList>(`/apis/main/shirts`, fetcher);
+  const { data, mutate } = useSWR<TaskList[]>("/apis/taskList", fetcher);
 
   const loading = !data;
 
@@ -21,11 +19,18 @@ export default function Web() {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <main className='p-10 mx-auto max-w-4xl'>
+      <main className='p-10 mx-auto max-w-4xl flex flex-col items-center gap-8'>
         <h1 className='text-6xl font-bold mb-4 text-center'>To-do List</h1>
-        <p className='mb-20 text-xl text-center'>
-        </p>
-        {data.map((taskList, idx) => <TodoList key={idx} taskList={taskList}/>)}
+        {loading ? (
+          <div
+            className='align-center justify-center flex flex-col w-24 h-24 rounded-full animate-spin
+                    border-4 border-dashed border-orange-500 border-t-transparent'
+          />
+        ) : (
+          data.map((taskList) => (
+            <TodoList key={taskList.id} taskList={taskList} />
+          ))
+        )}
       </main>
 
       <footer></footer>
