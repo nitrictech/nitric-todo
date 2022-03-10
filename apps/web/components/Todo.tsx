@@ -1,6 +1,5 @@
 import { useState, FC } from "react";
-import { Task, TaskList } from "../../../packages/types/index";
-import { dayFromNow, now } from "../lib/dates";
+import { Task, TaskList } from "types";
 
 interface Props {
   todo: Task;
@@ -8,26 +7,15 @@ interface Props {
   onDelete: () => void;
 }
 
-const Todo: FC<Props> = ({ todo, taskList, onDelete }) => {
+const Todo: FC<Props> = ({ todo, taskList }) => {
   const [isCompleted, setIsCompleted] = useState(todo.complete);
 
   const toggle = async () => {
-    setIsCompleted(true);
+    setIsCompleted(!isCompleted);
     await fetch(`/apis/taskList/${taskList.id}/${todo.id}`, {
       method: "PATCH",
+      body: JSON.stringify({ completed: !isCompleted }),
     });
-  };
-
-  const withinTimeRange = (timeRange: number): boolean =>
-    todo.dueDate >= now() && todo.dueDate <= dayFromNow(timeRange);
-
-  const getBackgroundColor = () => {
-    if (withinTimeRange(1)) {
-      return "bg-red-200";
-    } else if (withinTimeRange(3)) {
-      return "bg-amber-100";
-    }
-    return "bg-gray-200";
   };
 
   const formatDate = (date: number) =>
@@ -40,7 +28,7 @@ const Todo: FC<Props> = ({ todo, taskList, onDelete }) => {
 
   return (
     <div
-      className={`w-full block cursor-pointer hover:${getBackgroundColor()} focus:outline-none focus:${getBackgroundColor()} transition duration-150 ease-in-out`}
+      className={`w-full block cursor-pointer hover:bg-slate-200 focus:outline-none focus:bg-slate-200 transition duration-150 ease-in-out`}
     >
       <div className='flex items-center px-4 py-4 sm:px-6'>
         <div className='min-w-0 flex-1 flex items-left flex-col'>
@@ -53,7 +41,7 @@ const Todo: FC<Props> = ({ todo, taskList, onDelete }) => {
         </div>
         <div>
           <input
-            className='cursor-pointer border-r-10 w-5 h-5'
+            className='cursor-pointer hover:border-blue-600 border-r-10 w-5 h-5'
             onChange={(e) => toggle()}
             type='checkbox'
             checked={isCompleted}

@@ -23,3 +23,5 @@ export type TaskListRequest = Omit<TaskList, "id" | "tasks">;
 export type TaskPostRequest = Omit<Task, "id">;
 
 export type TaskListPostRequest = Omit<TaskList, "id" | "complete">;
+
+export type ToggleRequest = { completed: boolean };
