@@ -1,76 +1,243 @@
-import { api, collection } from '@nitric/sdk';
-import { Task, TaskListRequest, TaskPostRequest } from 'types';
-import uuid from 'short-uuid';
+import { api, collection } from "@nitric/sdk";
+import uuid from "short-uuid";
+import {
+  Filters,
+  Task,
+  TaskList,
+  TaskListPostRequest,
+  TaskPostRequest,
+} from "types";
+import { sortByCreatedAt } from "../common/utils";
 
-const taskApi = api('tasks');
-const tasksCollection = collection<Task>('todo').for('reading', 'writing', 'deleting');
+const taskListApi = api("taskList");
 
-// Get a single task via its id
-taskApi.get('/task/:id', async (ctx) => {
-  const { id } = ctx.req.params; 
+const taskListCol = collection<Omit<TaskList, "tasks">>("taskList").for(
+  "reading",
+  "writing",
+  "deleting"
+);
+
+// Get a task from a task list
+taskListApi.get("/:listid/:id", async (ctx) => {
+  const { listid: listId, id } = ctx.req.params;
 
   try {
-    const task = await tasksCollection.doc(id);
+    const taskListRef = taskListCol.doc(listId);
+    const task = await taskListRef.collection<Task>("tasks").doc(id).get();
 
     ctx.res.json(task);
   } catch (err) {
     console.log(err);
-    ctx.res.body = "Failed to retrieve task";
+    ctx.res.body = "Failed to retrieve tasks";
     ctx.res.status = 400;
   }
 
   return ctx;
 });
 
-// Get all tasks, with filters
-taskApi.get('/tasks', async (ctx) => {
-  const filters = ctx.req.json() as TaskListRequest;
+// Get all tasks from a task list, with filters
+taskListApi.get("/:id", async (ctx) => {
+  const { id } = ctx.req.params;
+  const filters = ctx.req.query as Filters;
 
   try {
-    let query = tasksCollection.query()
-    
+    const taskListRef = taskListCol.doc(id);
+    let query = taskListRef.collection<Task>("tasks").query();
+
     // Apply filters to query before executing query;
-    if (filters) {
-      Object.entries(filters).forEach(([k, v]) => {
-        switch (k) {
-          case 'complete':
-            query.where(k, '==', v as boolean);
-          case 'dueDate':
-            query.where(k, '>=', v.toString());
-          default:
-            query.where(k, 'startsWith', v as string)
+    Object.entries(filters).forEach(([k, v]) => {
+      switch (k) {
+        case "complete": {
+          query = query.where(k, "==", v === "true");
+          break;
         }
-      });
-    }
 
-    const taskList = await query.fetch()
+        case "dueDate": {
+          query = query.where(k, ">=", v.toString());
+          break;
+        }
 
-    ctx.res.json(taskList);
+        default: {
+          query = query.where(k, "startsWith", v as string);
+          break;
+        }
+      }
+    });
+
+    const taskList = await taskListRef.get();
+    const tasks = await query.fetch();
+
+    ctx.res.json({
+      ...taskList,
+      tasks: tasks.documents
+        .map((doc) => ({ id: doc.id, ...doc.content }))
+        .sort(sortByCreatedAt),
+    });
   } catch (err) {
     console.log(err);
-    ctx.res.body = "Failed to retrieve task list";
+    ctx.res.body = "Failed to retrieve tasks";
     ctx.res.status = 400;
   }
 
   return ctx;
-})
+});
 
-// Make new task
-taskApi.post('/task', async (ctx) => {
-  const taskData = ctx.req.json() as TaskPostRequest;
+// Get all task lists and their tasks
+taskListApi.get("/", async (ctx) => {
   try {
+    const taskList = await taskListCol.query().fetch();
+
+    const taskListsWithTasks = await Promise.all(
+      taskList.documents.map(async (doc) => {
+        const { documents: tasks } = await taskListCol
+          .doc(doc.id)
+          .collection<Task>("tasks")
+          .query()
+          .fetch();
+
+        return {
+          id: doc.id,
+          ...doc.content,
+          tasks: tasks
+            .map(({ id, content }) => ({ id, ...content }))
+            .sort(sortByCreatedAt),
+        };
+      })
+    );
+
+    ctx.res.json(taskListsWithTasks.sort(sortByCreatedAt));
+  } catch (err) {
+    console.log(err);
+    ctx.res.body = "Failed to retrieve taskList list";
+    ctx.res.status = 400;
+  }
+
+  return ctx;
+});
+
+// Make new taskList
+taskListApi.post("/", async (ctx) => {
+  const { name, tasks } = ctx.req.json() as TaskListPostRequest;
+
+  try {
+    if (!name) {
+      ctx.res.body = "A new task list requires a name";
+      ctx.res.status = 400;
+      return;
+    }
+
     const id = uuid.generate();
 
-    await tasksCollection.doc(id).set({
+    await taskListCol.doc(id).set({
       id,
-      complete: false,
-      ...taskData,
+      name,
+      createdAt: new Date().getTime(),
     });
+
+    // add any tasks if supplied
+    if (tasks) {
+      for (const task of tasks) {
+        const taskId = uuid.generate();
+        await taskListCol
+          .doc(id)
+          .collection<Task>("tasks")
+          .doc(taskId)
+          .set({
+            ...task,
+            complete: false,
+            createdAt: new Date().getTime(),
+          });
+      }
+    }
+
+    ctx.res.body = "Successfully added task list!";
+  } catch (err) {
+    console.log(err);
+    ctx.res.body = "Failed to add task list";
+    ctx.res.status = 400;
+  }
+
+  return ctx;
+});
+
+// Make new task for a task list
+taskListApi.post("/:id", async (ctx) => {
+  const { id } = ctx.req.params;
+  const task = ctx.req.json() as TaskPostRequest;
+
+  try {
+    if (!id) {
+      ctx.res.body = "A task list id is required";
+      ctx.res.status = 400;
+      return;
+    }
+
+    if (!task || !task.name) {
+      ctx.res.body = "A task with a name is required";
+      ctx.res.status = 400;
+      return;
+    }
+
+    const taskId = uuid.generate();
+
+    await taskListCol
+      .doc(id)
+      .collection<Omit<Task, "id">>("tasks")
+      .doc(taskId)
+      .set({
+        ...task,
+        complete: false,
+        createdAt: new Date().getTime(),
+      });
 
     ctx.res.body = "Successfully added task!";
   } catch (err) {
     console.log(err);
-    ctx.res.body = "Failed to add task";
+    ctx.res.body = "Failed to add task list";
+    ctx.res.status = 400;
+  }
+
+  return ctx;
+});
+
+// Update task as complete
+// Get a task from a task list
+taskListApi.patch("/:listid/:id", async (ctx) => {
+  const { listid: listId, id } = ctx.req.params;
+
+  try {
+    const taskListRef = taskListCol.doc(listId);
+    const taskRef = taskListRef.collection<Task>("tasks").doc(id);
+    const originalTask = await taskRef.get();
+
+    await taskListRef
+      .collection<Task>("tasks")
+      .doc(id)
+      .set({
+        ...originalTask,
+        complete: true,
+      });
+
+    ctx.res.body = "Successfully marked task as complete";
+  } catch (err) {
+    console.log(err);
+    ctx.res.body = "Failed to retrieve tasks";
+    ctx.res.status = 400;
+  }
+
+  return ctx;
+});
+
+// Delete a task list with specified id
+taskListApi.delete("/:id", async (ctx) => {
+  const { id } = ctx.req.params;
+
+  try {
+    await taskListCol.doc(id).delete();
+    ctx.res.body = "Successfully deleted task list";
+  } catch (err) {
+    console.log(err);
+    ctx.res.body = "Failed to delete task list";
     ctx.res.status = 400;
   }
 
@@ -78,12 +245,13 @@ taskApi.post('/task', async (ctx) => {
 });
 
 // Delete a task with specified id
-taskApi.delete('/task/:id', async (ctx) => {
-  const { id } = ctx.req.params;
+taskListApi.delete("/:listid/:id", async (ctx) => {
+  const { listid: listId, id } = ctx.req.params;
 
   try {
-    await tasksCollection.doc(id).delete();
-    ctx.res.body = "Successfully delete task";
+    const taskListRef = taskListCol.doc(listId);
+    await taskListRef.collection("tasks").doc(id).delete();
+    ctx.res.body = "Successfully deleted task";
   } catch (err) {
     console.log(err);
     ctx.res.body = "Failed to delete task";
