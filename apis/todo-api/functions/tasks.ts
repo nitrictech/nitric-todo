@@ -115,7 +115,7 @@ taskListApi.get("/", async (ctx) => {
   return ctx;
 });
 
-// Make new taskList
+// Make new task list, with optional tasks
 taskListApi.post("/", async (ctx) => {
   const { name, tasks } = ctx.req.json() as TaskListPostRequest;
 
@@ -201,7 +201,6 @@ taskListApi.post("/:id", async (ctx) => {
 });
 
 // Update task as complete
-// Get a task from a task list
 taskListApi.patch("/:listid/:id", async (ctx) => {
   const { listid: listId, id } = ctx.req.params;
 
