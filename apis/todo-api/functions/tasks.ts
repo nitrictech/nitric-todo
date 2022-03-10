@@ -53,7 +53,7 @@ taskListApi.get("/:id", async (ctx) => {
         }
 
         case "dueDate": {
-          query = query.where(k, ">=", v.toString());
+          query = query.where(k, ">=", v);
           break;
         }
 
