@@ -22,7 +22,7 @@ export default function Web() {
       </Head>
 
       <main className='p-10 mx-auto max-w-4xl'>
-        <h1 className='text-6xl font-bold mb-4 text-center'>Todo List</h1>
+        <h1 className='text-6xl font-bold mb-4 text-center'>To-do List</h1>
         <p className='mb-20 text-xl text-center'>
         </p>
         {data.map((taskList, idx) => <TodoList key={idx} taskList={taskList}/>)}

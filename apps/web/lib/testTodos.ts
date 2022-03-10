@@ -1,9 +1,11 @@
 import type { TaskList, Task } from "types";
+import { dayFromNow, now, weekFromNow } from "./dates";
 
 export const testTasks: TaskList[] = [
   {
     id: "1000",
     name: "Daily Tasks",
+    createdAt: now(),
     tasks: [
       {
         id: "1001",
@@ -18,6 +20,7 @@ export const testTasks: TaskList[] = [
   {
     id: "2000",
     name: "Work Tasks",
+    createdAt: now(),
     tasks: [
       {
         id: "2001",

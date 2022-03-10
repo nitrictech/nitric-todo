@@ -1,18 +1,35 @@
-import { FC, useState, useEffect } from 'react'
-import { TaskList, TaskPostRequest } from 'types'
+import { FC, useState, useEffect, useReducer } from 'react'
+import { TaskList, Task, TaskPostRequest } from 'types'
+import { now } from '../lib/dates';
 import Alert from './Alert';
+import SortDropdown, { SortType } from './SortDropdown';
 import Todo from './Todo';
 
 interface Props {
   taskList: TaskList;
 }
 
+const todoSort = (state: Task[], action): Task[] => {
+  console.log(action.type)
+  switch(action.type as SortType) {
+    case 'ascendingDue':
+      return state.sort((a, b) => b.dueDate - a.dueDate);
+    case 'descendingDue':
+      return state.sort((a, b) => a.dueDate - b.dueDate);
+    case 'ascendingCreated':
+      return state.sort((a, b) => b.createdAt - a.createdAt);
+    case 'descendingCreated':
+      return state.sort((a, b) => a.createdAt - b.createdAt);
+    default:
+      console.log("Sort type doesn't exist");
+  }
+}
 
 const TodoList: FC<Props> = ({ taskList }) => {
-  const [todos, setTodos] = useState(taskList.tasks)
-  const [newTask, setNewTask] = useState<TaskPostRequest>({ name: "" })
+  const [todos, dispatchTodos] = useReducer(todoSort, taskList.tasks)
+  const [newTask, setNewTask] = useState<TaskPostRequest>({ name: "", complete: false, createdAt: now() })
   const [errorText, setError] = useState('')
-
+  
   useEffect(() => {
     fetchTodos()
   }, [])
@@ -26,14 +43,20 @@ const TodoList: FC<Props> = ({ taskList }) => {
   const deleteTodo = async (id) => {
   }
 
+
+
   return (
     <div className="w-full">
-      <h1 className="font-bold">{taskList.name}</h1>
+      <div>
+        <h1 className="font-bold">{taskList.name}</h1>
+        <SortDropdown sortFunc={dispatchTodos}/>
+      </div>
+      <button onClick={() => dispatchTodos({type: "ascendingCreated"})}>Click </button>
       <div className="flex gap-2 my-2">
         <input
           className="rounded w-full p-2"
           type="text"
-          placeholder="make coffee"
+          placeholder="New task"
           value={newTask.name}
           onChange={(e) => {
             setError('')
@@ -41,14 +64,17 @@ const TodoList: FC<Props> = ({ taskList }) => {
           }}
         />
         <input
-          className="rounded w-fit p-2"
+          className="rounded w-1/4 p-2"
           type="date"
           onChange={(e) => {
             setError('')
-            setNewTask(task => ({...task, dueDate: e.target.value }))
+            setNewTask(task => ({...task, dueDate: new Date(e.target.value).getTime() }))
           }}
         />
-        <button className="btn-black hover:bg-slate-100 p-1 rounded-md" onClick={() => addTodo(newTask)}>
+        <button 
+          className="rounded-full bg-orange-200 hover:bg-orange-300 w-1/6" 
+          onClick={() => addTodo(newTask)}
+        >
           Add
         </button>
       </div>

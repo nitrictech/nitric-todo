@@ -4,8 +4,7 @@ export interface Task {
   name: string;
   complete: boolean;
   description?: string;
-  dueDate?: Date;
-  createdAt?: Date;
+  dueDate?: number;
 }
 
 export interface TaskList {
