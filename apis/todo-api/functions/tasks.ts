@@ -1,4 +1,3 @@
-import { api, collection, schedule } from "@nitric/sdk";
 import uuid from "short-uuid";
 import {
   Filters,
@@ -9,21 +8,17 @@ import {
   ToggleRequest,
 } from "types";
 import { sortByCreatedAt } from "../common/utils";
+import { taskListApi } from "../resources/apis";
+import { taskListCol } from "../resources/collections";
 
-const taskListApi = api("taskList");
-
-const taskListCol = collection<Omit<TaskList, "tasks">>("taskList").for(
-  "reading",
-  "writing",
-  "deleting"
-);
+const taskLists = taskListCol.for("reading", "writing", "deleting");
 
 // Get a task from a task list
 taskListApi.get("/:listid/:id", async (ctx) => {
   const { listid: listId, id } = ctx.req.params;
 
   try {
-    const taskListRef = taskListCol.doc(listId);
+    const taskListRef = taskLists.doc(listId);
     const task = await taskListRef.collection<Task>("tasks").doc(id).get();
 
     ctx.res.json(task);
@@ -37,12 +32,12 @@ taskListApi.get("/:listid/:id", async (ctx) => {
 });
 
 // Get all tasks from a task list, with filters
-taskListApi.get("/:id", async (ctx) => {
-  const { id } = ctx.req.params;
+taskListApi.get("/:listid", async (ctx) => {
+  const { listid } = ctx.req.params;
   const filters = ctx.req.query as Filters;
 
   try {
-    const taskListRef = taskListCol.doc(id);
+    const taskListRef = taskLists.doc(listid);
     let query = taskListRef.collection<Task>("tasks").query();
 
     // Apply filters to query before executing query;
@@ -86,11 +81,11 @@ taskListApi.get("/:id", async (ctx) => {
 // Get all task lists and their tasks
 taskListApi.get("/", async (ctx) => {
   try {
-    const taskList = await taskListCol.query().fetch();
+    const taskList = await taskLists.query().fetch();
 
     const taskListsWithTasks = await Promise.all(
       taskList.documents.map(async (doc) => {
-        const { documents: tasks } = await taskListCol
+        const { documents: tasks } = await taskLists
           .doc(doc.id)
           .collection<Task>("tasks")
           .query()
@@ -129,7 +124,7 @@ taskListApi.post("/", async (ctx) => {
 
     const id = uuid.generate();
 
-    await taskListCol.doc(id).set({
+    await taskLists.doc(id).set({
       id,
       name,
       createdAt: new Date().getTime(),
@@ -139,7 +134,7 @@ taskListApi.post("/", async (ctx) => {
     if (tasks) {
       for (const task of tasks) {
         const taskId = uuid.generate();
-        await taskListCol
+        await taskLists
           .doc(id)
           .collection<Task>("tasks")
           .doc(taskId)
@@ -162,12 +157,12 @@ taskListApi.post("/", async (ctx) => {
 });
 
 // Make new task for a task list
-taskListApi.post("/:id", async (ctx) => {
-  const { id } = ctx.req.params;
+taskListApi.post("/:listid", async (ctx) => {
+  const { listid } = ctx.req.params;
   const task = ctx.req.json() as TaskPostRequest;
 
   try {
-    if (!id) {
+    if (!listid) {
       ctx.res.body = "A task list id is required";
       ctx.res.status = 400;
       return;
@@ -181,8 +176,8 @@ taskListApi.post("/:id", async (ctx) => {
 
     const taskId = uuid.generate();
 
-    await taskListCol
-      .doc(id)
+    await taskLists
+      .doc(listid)
       .collection<Omit<Task, "id">>("tasks")
       .doc(taskId)
       .set({
@@ -207,7 +202,7 @@ taskListApi.patch("/:listid/:id", async (ctx) => {
   const { completed } = ctx.req.json() as ToggleRequest;
 
   try {
-    const taskListRef = taskListCol.doc(listId);
+    const taskListRef = taskLists.doc(listId);
     const taskRef = taskListRef.collection<Task>("tasks").doc(id);
     const originalTask = await taskRef.get();
 
@@ -234,7 +229,7 @@ taskListApi.delete("/:id", async (ctx) => {
   const { id } = ctx.req.params;
 
   try {
-    await taskListCol.doc(id).delete();
+    await taskLists.doc(id).delete();
     ctx.res.body = "Successfully deleted task list";
   } catch (err) {
     console.log(err);
@@ -250,7 +245,7 @@ taskListApi.delete("/:listid/:id", async (ctx) => {
   const { listid: listId, id } = ctx.req.params;
 
   try {
-    const taskListRef = taskListCol.doc(listId);
+    const taskListRef = taskLists.doc(listId);
     await taskListRef.collection("tasks").doc(id).delete();
     ctx.res.body = "Successfully deleted task";
   } catch (err) {
