@@ -21,18 +21,16 @@ In the guide we'll use the following:
 
 ## Start with a Nextjs App
 
-We'll start with a our [Next.js starter repository](https://github.com/nitrictech/nextjs-starter), to get our application up and running faster. If you want to start with the finished product, and follow along that way, just clone [Nitric to-do]("https://github.com/nitrictech/nitric-todo).
+We'll start with the finished product, and follow along that way, just clone [Nitric to-do]("https://github.com/nitrictech/nitric-todo).
 
 ```bash
-git clone https://github.com/nitrictech/nexjs-starter todo-project
-  OR
-git clone https://github.com/nitrictech/nitric-todo todo-project
+git clone https://github.com/nitrictech/nitric-todo
 ```
 
 Install the dependencies with npm or yarn.
 
 ```bash
-cd todo-project
+cd nitric-todo
 yarn install
 ```
 
