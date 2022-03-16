@@ -1,6 +1,6 @@
-# Next.js Starter
+# To-do List
 
-This is a [Next.js](https://nextjs.org/) project that uses a [Nitric API](https://nitric.io/docs/apis) with [Nitric Collections](https://nitric.io/docs/collections) and [Nitric Storage ](https://nitric.io/docs/storage)to store and display data. It also uses [Tailwind CSS](https://tailwindcss.com/) for styling and [Turborepo](https://turborepo.org/) for the build system.
+This is a [Next.js](https://nextjs.org/) project that uses a [Nitric API](https://nitric.io/docs/apis) with [Nitric Collections](https://nitric.io/docs/collections) to store and display data. It also uses [Tailwind CSS](https://tailwindcss.com/) for styling and [Turborepo](https://turborepo.org/) for the build system.
 
 ## Prerequisites
 
@@ -9,16 +9,16 @@ This is a [Next.js](https://nextjs.org/) project that uses a [Nitric API](https:
 
 ## Set up the Next.js app
 
-Clone the [Next.js starter repository]().
+Clone the [Nitric To-do](https://github.com/nitrictech/nitric-todo) repository.
 
 ```bash
-git clone https://github.com/nitrictech/nextjs-starter
+git clone https://github.com/nitrictech/nitric-todo
 ```
 
 Install the dependencies:
 
 ```text
-cd nextjs-starter
+cd nitric-todo
 yarn install
 ```
 
@@ -30,7 +30,92 @@ This project is split into three main area:
 - **apps** - This is where your web applications are stored
 - **packages** - This is where shared common code is stored (such as types and configuration)
 
-## Set up API proxy
+## Whats in our API
+
+### Routing
+
+There are a number of endpoints set up to retrieve and update tasks from the frontend.
+
+```typescript
+import { api } from '@nitric/sdk';
+
+const taskListApi = api("taskList");
+
+taskListApi.get("/:listid/:id", async (ctx) => {});      // Get task with [id]
+taskListApi.get("/:id", async (ctx) => {);               // Get task list with [id]
+taskListApi.get("/", async (ctx) => {});                 // Get all task lists
+taskListApi.post("/:id", async (ctx) => {});             // Post new task for task list
+taskListApi.post("/", async (ctx) => {});                // Post new task list
+taskListApi.patch("/:listid/:id", async (ctx) => {});    // Update task
+taskListApi.delete("/:id", async (ctx) => {});           // Delete task list
+taskListApi.delete("/:listid/:id", async (ctx) => {});   // Delete task
+```
+
+We create a new collection resource that has permissions to read, write and delete
+
+```typescript
+import { api, collection } from '@nitric/sdk';
+import { TaskList } from "types";
+
+type TaskCollection = Omit<TaskList, "tasks">
+
+const taskListCol = collection<TaskCollection>("taskLists").for(
+  "reading",
+  "writing",
+  "deleting",
+);
+```
+
+Now that we have the collection, we can start adding tasks and task lists. We use subcollections for each of our task lists and documents for each of our tasks.
+
+We can put a new task to a task list by adding a new document to the task list subcollection.
+
+```typescript
+taskListApi.post("/:id", async (ctx) => {
+  const { id } = ctx.req.params;
+  const task = ctx.req.json() as TaskPostRequest;
+
+  const taskId = uuid.generate();
+
+  await taskListCol
+    .doc(id)
+    .collection<Omit<Task, "id">>("tasks")
+    .doc(taskId)
+    .set({
+      ...task,
+      complete: false,
+      createdAt: new Date().getTime(),
+    });
+
+  ...
+```
+
+Within our `/:listid/:id` endpoint we can start retrieving tasks.
+
+```typescript
+// Get a task from a task list
+taskListApi.get("/:listid/:id", async (ctx) => {
+  const { listid: listId, id } = ctx.req.params;
+
+  try {
+    // Get our task list with id [listId]
+    const taskListRef = taskListCol.doc(listId); 
+    // Get all tasks from the collection with id [id]
+    const task = await taskListRef.collection<Task>("tasks").doc(id).get();
+
+    ctx.res.json(task);
+  } catch (err) {
+    console.log(err);
+    ctx.res.body = "Failed to retrieve tasks";
+    ctx.res.status = 400;
+  }
+
+  return ctx;
+});
+
+```
+
+### Set up API proxy
 
 Next, you'll want to run your application locally. Start by create your `.env` file by renaming the `.env.example` file:
 
@@ -48,9 +133,9 @@ Run the app with the following command:
 yarn dev
 ```
 
-> This will use turbo repo to run both your nextjs app and the nitric shirts api
+> This will use turbo repo to run both your nextjs app and the nitric todo api
 
-Open your browser at localhost:3000 to see the running application.
+Open your browser at `localhost:3000` to see the running application.
 
 If you make any changes to the API or App, hot reloading is enabled so the API will rebuild.
 
