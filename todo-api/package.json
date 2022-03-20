@@ -1,0 +1,14 @@
+{
+  "name": "typescript-starter",
+  "version": "1.0.0",
+  "description": "nitric typescript starter template",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@nitric/sdk": "0.4.0-rc.11",
+    "short-uuid": "^4.2.0"
+  },
+  "scripts": {
+    "dev": "yarn --cwd ../../ nitric-run"
+  }
+}

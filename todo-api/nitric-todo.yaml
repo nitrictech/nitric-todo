@@ -1,0 +1,3 @@
+name: todo
+provider: aws
+region: ap-southeast-1
