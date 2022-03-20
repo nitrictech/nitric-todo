@@ -23,7 +23,7 @@ const TodoList: FC<Props> = ({ taskList, updateTaskList }) => {
   }, [taskList]);
 
   const addTodo = async (newTask: TaskPostRequest) => {
-    await fetch(`https://8ao5gespxc.execute-api.ap-southeast-1.amazonaws.com/${taskList.id}`, {
+    await fetch(`/taskList/${taskList.id}`, {
       method: "POST",
       body: JSON.stringify(newTask),
     });
@@ -31,7 +31,7 @@ const TodoList: FC<Props> = ({ taskList, updateTaskList }) => {
   };
 
   const deleteTodo = async (listId: string, taskId: string) => {
-    await fetch(`https://8ao5gespxc.execute-api.ap-southeast-1.amazonaws.com/${listId}/${taskId}`, {
+    await fetch(`/taskList/${listId}/${taskId}`, {
       method: "DELETE",
     });
     updateTaskList();
