@@ -1,3 +1,0 @@
-name: nitric-todo
-handlers:
-  - apis/todo-api/functions/*.ts
