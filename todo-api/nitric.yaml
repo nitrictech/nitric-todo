@@ -1,0 +1,3 @@
+name: nitric-todo
+handlers:
+  - functions/*.ts
