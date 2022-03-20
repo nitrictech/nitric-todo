@@ -12,7 +12,7 @@ const Todo: FC<Props> = ({ todo, taskList }) => {
 
   const toggle = async () => {
     setIsCompleted(!isCompleted);
-    await fetch(`https://8ao5gespxc.execute-api.ap-southeast-1.amazonaws.com//apis/taskList${taskList.id}/${todo.id}`, {
+    await fetch(`https://8ao5gespxc.execute-api.ap-southeast-1.amazonaws.com/${taskList.id}/${todo.id}`, {
       method: "PATCH",
       body: JSON.stringify({ completed: !isCompleted }),
     });
