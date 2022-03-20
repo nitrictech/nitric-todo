@@ -23,7 +23,7 @@ const TodoList: FC<Props> = ({ taskList, updateTaskList }) => {
   }, [taskList]);
 
   const addTodo = async (newTask: TaskPostRequest) => {
-    await fetch(`/taskList/${taskList.id}`, {
+    await fetch(`/${taskList.id}`, {
       method: "POST",
       body: JSON.stringify(newTask),
     });
