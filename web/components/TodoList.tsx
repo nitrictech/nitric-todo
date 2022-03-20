@@ -23,7 +23,7 @@ const TodoList: FC<Props> = ({ taskList, updateTaskList }) => {
   }, [taskList]);
 
   const addTodo = async (newTask: TaskPostRequest) => {
-    await fetch(`/apis/taskList/${taskList.id}`, {
+    await fetch(`${process.env.API_BASE_URL}/apis/taskList/${taskList.id}`, {
       method: "POST",
       body: JSON.stringify(newTask),
     });
@@ -31,7 +31,7 @@ const TodoList: FC<Props> = ({ taskList, updateTaskList }) => {
   };
 
   const deleteTodo = async (listId: string, taskId: string) => {
-    await fetch(`/apis/taskList/${listId}/${taskId}`, {
+    await fetch(`${process.env.API_BASE_URL}/apis/taskList/${listId}/${taskId}`, {
       method: "DELETE",
     });
     updateTaskList();
