@@ -8,14 +8,14 @@ import { useState } from "react";
 export default function Web() {
   const [newListName, setNewListName] = useState("");
   const { data, mutate: updateTaskList } = useSWR<TaskList[]>(
-    `${process.env.API_BASE_URL}/apis/taskList`,
+    `https://8ao5gespxc.execute-api.ap-southeast-1.amazonaws.com//apis/taskList`,
     fetcher
   );
 
   const loading = !data;
 
   const handleAddList = async () => {
-    await fetch(`${process.env.API_BASE_URL}/apis/taskList`, {
+    await fetch(`https://8ao5gespxc.execute-api.ap-southeast-1.amazonaws.com//apis/taskList`, {
       method: "POST",
       body: JSON.stringify({
         name: newListName,
