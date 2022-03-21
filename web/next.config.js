@@ -10,8 +10,8 @@ module.exports = {
   async rewrites() {
     return [
       {
-        source: "/:path*",
-        destination: `${process.env.API_BASE_URL}/:path*`, // Proxy to Backend
+        source: "/apis/:path*",
+        destination: process.env.API_BASE_URL, // Proxy to Backend
       },
     ];
   },
