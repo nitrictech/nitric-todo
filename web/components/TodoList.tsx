@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from "react";
-import { TaskList, Task, TaskPostRequest } from "types";
+import { TaskList, Task, TaskPostRequest } from "../types";
 import { now } from "../lib/dates";
 import Todo from "./Todo";
 

@@ -1,5 +1,5 @@
 import { useState, FC } from "react";
-import { Task, TaskList } from "types";
+import { Task, TaskList } from "../types";
 
 interface Props {
   todo: Task;

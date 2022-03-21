@@ -1,6 +1,6 @@
 import Head from "next/head";
 import useSWR from "swr";
-import type { TaskList } from "types";
+import type { TaskList } from "../types";
 import fetcher from "../lib/fetcher";
 import TodoList from "../components/TodoList";
 import { useState } from "react";
@@ -15,7 +15,7 @@ export default function Web() {
   const loading = !data;
 
   const handleAddList = async () => {
-    await fetch("/", {
+    await fetch("/apis", {
       method: "POST",
       body: JSON.stringify({
         name: newListName,
