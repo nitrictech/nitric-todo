@@ -8,7 +8,7 @@ import { useState } from "react";
 export default function Web() {
   const [newListName, setNewListName] = useState("");
   const { data, mutate: updateTaskList } = useSWR<TaskList[]>(
-    "/",
+    "/apis",
     fetcher
   );
 
