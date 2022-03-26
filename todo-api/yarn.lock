@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@grpc/grpc-js@^1.1.7":
+"@grpc/grpc-js@^1.5.9":
   version "1.5.9"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.5.9.tgz#df44b3d6bc1d5eb4779aab96e00f6084fd07a3c8"
   integrity sha512-un+cXqErq5P4p3+WgYVNVh7FB51MSnaoRef7QWDcMXKR6FX2R6Z/bltcJMxNNdTUMC85lkOQcpnAAetFziPSng==
@@ -21,22 +21,21 @@
     protobufjs "^6.10.0"
     yargs "^16.2.0"
 
-"@nitric/api@0.14.0-rc.4":
-  version "0.14.0-rc.4"
-  resolved "https://registry.yarnpkg.com/@nitric/api/-/api-0.14.0-rc.4.tgz#8bb4da04c6150967cda4201566f46c85bf5cb2f5"
-  integrity sha512-sXJawjJmDcad2CafUksg1DqWXJm1S69v0nt0s0qxAQvEmBJIiCDnFbsbKNIh3W+FvNejydzMLfkXjzHBgI1Z5Q==
+"@nitric/api@0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@nitric/api/-/api-0.15.0.tgz#4e8825dd0fda21437b477e6c81ab2bb1f15a22e6"
+  integrity sha512-xxldlWIAZHhkrfHsueEcZ9zaoSLTSAtHlrrZaodF5bKIJigbXkI3GLhSLm1hOcFGerguUx1y8l+Pc/slPI+s6g==
   dependencies:
-    "@grpc/grpc-js" "^1.1.7"
     google-protobuf "3.14.0"
     tslib "^2.1.0"
 
-"@nitric/sdk@0.4.0-rc.11":
-  version "0.4.0-rc.11"
-  resolved "https://registry.yarnpkg.com/@nitric/sdk/-/sdk-0.4.0-rc.11.tgz#ccb0d616f9406365d3354d900aca5c22d88487b1"
-  integrity sha512-SfbpwuCw2Hud0GkuzdJf0frkOaI2naUVWb4RnPA1nN4A1Giw52bdVynVWiMMYAyKcNZ+ewD73uMza5Jqno2ynQ==
+"@nitric/sdk@0.4.0-rc.12":
+  version "0.4.0-rc.12"
+  resolved "https://registry.yarnpkg.com/@nitric/sdk/-/sdk-0.4.0-rc.12.tgz#2ed25d5e81a0aead01e885c4ac4e43046a5f8d98"
+  integrity sha512-kSXHuRGvdd0HskLoX69zhbHnzgDWL00nVfOWRugHdXHUjxtFtALzsS5a7Z0ZC8ReSJ7Jkjxu4KjK7Dpzed0yGQ==
   dependencies:
-    "@grpc/grpc-js" "^1.1.7"
-    "@nitric/api" "0.14.0-rc.4"
+    "@grpc/grpc-js" "^1.5.9"
+    "@nitric/api" "0.15.0"
     common-tags "^1.8.0"
     google-protobuf "3.14.0"
     path-parser "^6.1.0"
@@ -101,9 +100,9 @@
   integrity sha512-5tXH6Bx/kNGd3MgffdmP4dy2Z+G4eaXw0SE81Tq3BNadtnMR5/ySMzX4SLEzHJzSmPNn4HIdpQsBvXMUykr58w==
 
 "@types/node@>=12.12.47", "@types/node@>=13.7.0":
-  version "17.0.21"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.21.tgz#864b987c0c68d07b4345845c3e63b75edd143644"
-  integrity sha512-DBZCJbhII3r90XbQxI8Y9IjjiiOGlZ0Hr32omXIZvwwZ7p4DMMXGrKXVyPfuoBOri9XNtL0UK69jYIBIsRX3QQ==
+  version "17.0.22"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.22.tgz#38b6c4b9b2f3ed9f2e376cce42a298fb2375251e"
+  integrity sha512-8FwbVoG4fy+ykY86XCAclKZDORttqE5/s7dyWZKLXTdv3vRy5HozBEinG5IqhvPXXzIZEcTVbuHlQEI6iuwcmw==
 
 ansi-regex@^5.0.1:
   version "5.0.1"
