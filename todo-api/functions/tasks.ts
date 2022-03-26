@@ -2,11 +2,10 @@ import uuid from "short-uuid";
 import {
   Filters,
   Task,
-  TaskList,
   TaskListPostRequest,
   TaskPostRequest,
   ToggleRequest,
-} from "types";
+} from "../types";
 import { sortByCreatedAt } from "../common/utils";
 import { taskListApi } from "../resources/apis";
 import { taskListCol } from "../resources/collections";

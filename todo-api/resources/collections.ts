@@ -1,5 +1,5 @@
-import { collection } from '@nitric/sdk';
-import { TaskList } from 'types';
+import { collection } from "@nitric/sdk";
+import { TaskList } from "../types";
 
 type TaskCollection = Omit<TaskList, "tasks">;
 

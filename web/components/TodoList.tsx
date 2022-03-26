@@ -70,7 +70,7 @@ const TodoList: FC<Props> = ({ taskList, updateTaskList }) => {
           Add
         </button>
       </div>
-      <div className='bg-white shadow overflow-hidden rounded-md mb-10'>
+      <div className='bg-white shadow rounded-md mb-10'>
         <ul>
           {todos.map((todo) => (
             <Todo
